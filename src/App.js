@@ -3,12 +3,12 @@ import './App.css';
 import Navigation from "./components/Navigation/Navigation";
 import Logo from "./components/Logo/Logo";
 import Signin from "./components/Signin/Signin";
-// import Register from "./components/Register/Register";
+import Register from "./components/Register/Register";
 import Rank from "./components/Rank/Rank";
 import ImageLinkForm from "./components/ImageLinkForm/ImageLinkForm";
 import Particles from 'react-particles-js';
 import FaceRecognition from "./components/FaceRecognition/FaceRecognition";
-import Register from "./Register/Register";
+
 
 const particleOptions = {
   particles: {
