@@ -24,28 +24,38 @@ class Signin extends React.Component {
         POST http://localhost:3000/signin 500 (Internal Server Error)
         (anonymous) @ VM333:1
         */
+        console.log(this.state)
         fetch('http://localhost:3000/signin', {
-            method: 'POST',
-            // headers: {'Content-Type': 'application/json'},
+            method: 'post',
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 email: this.state.signInEmail,
                 password: this.state.signInPassword
             })
                 .then(res => res.json())
-                .then(user =>{
-                    console.log(user.id)
-                    if (user.id){
-                        this.props.loadUser(user)
+                .then(console.log)
+                .then(data => {
+                    if (data === "success"){
                         this.props.onRouteChange("rankpage")
                     }
-                }
-                )
-                .catch(error => console.error('Error:', error))
+                })
+                // .then(user =>{
+                //     console.log(user.id)
+                //     if (user.id){
+                //         this.props.loadUser(user)
+                //         this.props.onRouteChange("rankpage")
+                //     }
+                // }
+                // )
+                .catch(function(error) {
+                    console.log(error);
+                })
+                // .catch(error => console.error('Error:', error))
                 .then(res => console.log('Success:', res))
 
         })
-        this.props.onRouteChange("rankpage")
-        console.log(this.state);
+        // this.props.onRouteChange("rankpage")
+      
     }
 
 
@@ -80,8 +90,8 @@ class Signin extends React.Component {
                 // 箭头函数：render的时候不调用这个函数，只有当onClick的时候才调用
                 // 设置只有提交了数据才会页面跳转
 
-                    // onClick = {this.onSubmitSignIn}
-                    onClick = {() => onRouteChange("rankpage")}
+                    onClick = {this.onSubmitSignIn}
+                    // onClick = {() => onRouteChange("rankpage")}
                     className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib" 
                     type="submit" 
                     value="Sign in" />

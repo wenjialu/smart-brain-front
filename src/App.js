@@ -35,9 +35,12 @@ class App extends Component{
   constructor(){
     super()
     this.state = {
+      //输入的url
       input: "",
       route: "signin",
       isSignedIn: false,
+      imageUrl: '',
+      box: {},
       user:{
         id:"",
         name:"",
@@ -48,12 +51,17 @@ class App extends Component{
     }
   }
 
-//   // 测试连接
+//   测试连接, 如果访问成功/接口，会返回database.users.
+// // 经过测试，测试成功的
 //  componentDidMount(){
 //    fetch("http://localhost:3000")
 //    .then(response => response.json())
 //    .then(console.log)
+//    .catch(function(error) {
+//     console.log(error);
+// })
 //  }
+
 
   onRouteChange = (route) => {
     if (route === 'signout') {
@@ -75,19 +83,70 @@ class App extends Component{
     }})
   }
 
+  calculateFaceLocation = (data) => {
+    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+    const image = document.getElementById('inputimage');
+    const width = Number(image.width);
+    const height = Number(image.height);
+    //  乘上百分比
+    return {
+      leftCol: clarifaiFace.left_col * width,
+      topRow: clarifaiFace.top_row * height,
+      rightCol: width - (clarifaiFace.right_col * width),
+      bottomRow: height - (clarifaiFace.bottom_row * height)
+    }
+  }
+
+  displayFaceBox = (box) =>{
+    this.setState({box: box});
+  }
+
 
   onInputChange = (event) => {
     console.log(event.target.value);
+    this.setState({input:event.target.value})
   }
+
 
   onButtonSubmit = () => {
     console.log("click");
+    this.setState({imageUrl: this.state.input});
+
+    fetch('http://localhost:3000/imageurl', {
+        method: 'post',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          input: this.state.input
+        })
+    })
+       // 自己加的
+        .then(console.log)
+        
+        .then(response => response.json())
+   
+
+        .then(response => {
+          if (response){
+            fetch('http://localhost:3000/image', {
+              method: 'put',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                id: this.state.user.id
+            })
+          })
+            
+            .then(response => response.json())
+            .then(count => {
+              this.setState(Object.assign(this.state.user, { entries: count}))
+            })
+            .catch(console.log)
+          }
+          this.displayFaceBox(this.calculateFaceLocation(response))
+        })
+        .catch(err => console.log(err));
   }
-
- 
-
   render() {
-    const {isSignedIn, route} = this.state;
+    const {isSignedIn, route, imageUrl, box} = this.state;
     return (
       <div className="App">
         <Particles className="particles"
@@ -100,7 +159,7 @@ class App extends Component{
                 <Logo /> 
                 <Rank />
                 <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit}/>
-                <FaceRecognition />
+                <FaceRecognition box={box} imageUrl={imageUrl}/>
                 </div>
           
             :(
